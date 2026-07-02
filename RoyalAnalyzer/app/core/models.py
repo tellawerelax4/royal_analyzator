@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import StrEnum
 
@@ -29,7 +29,7 @@ class Roll:
     combination: Combination | None = None
     round_id: str | None = None
     session_id: str | None = None
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = datetime.now(timezone.utc)
     id: int | None = None
 
     def __post_init__(self) -> None:

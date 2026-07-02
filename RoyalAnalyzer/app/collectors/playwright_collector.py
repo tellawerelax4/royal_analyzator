@@ -1,4 +1,4 @@
-"""Playwright collector with adaptive DOM probing and OCR fallback hooks."""
+"""Playwright collector with DOM probing, keepalive, and OCR fallback hooks."""
 from __future__ import annotations
 
 import asyncio
@@ -32,6 +32,13 @@ class RoyalPlaywrightCollector:
     The primary strategy counts pip elements inside `color="Red"`/`color="Blue"` dice
     containers. This matches the supplied DOM and ignores generated CSS class names. If
     the DOM signal disappears, the optional OCR reader can provide five dice values.
+
+class RoyalPlaywrightCollector:
+    """Collects Royal results while adapting to DOM changes.
+
+    The collector probes text, attributes, SVG/IMG nodes, canvas candidates, mutation
+    events, and shadow roots. If no stable DOM signal is found, callers can connect an
+    OCR implementation through ``ocr_reader``.
     """
 
     def __init__(self, url: str, ocr_reader: Callable[[], tuple[int, ...] | None] | None = None) -> None:
@@ -79,6 +86,16 @@ class RoyalPlaywrightCollector:
             ocr_values = self.ocr_reader()
             values = tuple(ocr_values) if ocr_values and len(ocr_values) == 5 else None
         return values
+
+
+    async def iter_rolls(self) -> AsyncIterator[Roll]:
+        """Yield rolls from the configured source."""
+        self._running = True
+        while self._running:
+            values = self.ocr_reader() if self.ocr_reader else None
+            if values and len(values) == 5:
+                yield Roll(dice=tuple(values))  # type: ignore[arg-type]
+            await asyncio.sleep(1)
 
     async def keepalive(self, page: object) -> None:
         """Perform randomized safe actions that do not place bets."""
