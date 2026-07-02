@@ -18,6 +18,20 @@ claim or guarantee a betting advantage.
 - `backtesting`: historical simulations and drawdown/profit metrics.
 - `gui`: PySide6 dark dashboard shell.
 
+## Quick start in PyCharm
+
+For Windows/PyCharm setup instructions, see [RUN_IN_PYCHARM.md](RUN_IN_PYCHARM.md).
+
+Short version:
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+playwright install chromium
+python -m RoyalAnalyzer.app.main
+```
+
 ## Development
 
 ```bash

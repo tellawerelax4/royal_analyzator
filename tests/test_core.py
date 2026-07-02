@@ -21,3 +21,18 @@ def test_statistics_and_ensemble_prediction():
     prediction = model.predict(rolls)
     assert set(prediction) == {1, 2, 3, 4, 5, 6}
     assert round(sum(prediction.values()), 6) == 1.0
+
+from RoyalAnalyzer.app.collectors.royal_dom_parser import parse_last_roll, parse_royal_dice_html
+
+
+def test_parse_supplied_royal_dom_snippet():
+    html = '''<div class="sc-zOxLx cgJbZr"><div class="sc-jxYSNo gDtmG"><div class="sc-erPUmh BKmw"><div color="Red" class="sc-iRTMaw hhTurn"><div class="sc-eKrodz laUure" style="grid-area: 1 / 1;"></div><div class="sc-eKrodz laUure" style="grid-area: 1 / 3;"></div><div class="sc-eKrodz laUure" style="grid-area: 3 / 1;"></div><div class="sc-eKrodz laUure" style="grid-area: 3 / 3;"></div></div><div color="Blue" class="sc-iRTMaw hoviMl"><div class="sc-eKrodz laUure" style="grid-area: 2 / 2;"></div></div></div></div></div>'''
+    dice = parse_royal_dice_html(html)
+    assert [die.value for die in dice] == [4, 1]
+    assert [die.color for die in dice] == ["Red", "Blue"]
+
+
+def test_parse_last_roll_from_history_level():
+    die = lambda color, pips: f'<div color="{color}">' + ''.join('<div style="grid-area: 1 / 1;"></div>' for _ in range(pips)) + '</div>'
+    html = '<section>' + ''.join(die('Red' if value % 2 else 'Blue', value) for value in [1, 2, 3, 4, 5]) + '</section>'
+    assert parse_last_roll(html) == (1, 2, 3, 4, 5)
